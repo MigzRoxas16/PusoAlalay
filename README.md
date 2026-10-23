@@ -7,7 +7,7 @@ A Filipino and English heart-health journal for Android, built with Kotlin and J
 ## Install on your phone
 
 1. On your phone, open the latest release: https://github.com/MigzRoxas16/PusoAlalay/releases/latest
-2. Tap **PusoAlalay-v1.1-debug.apk** to download it.
+2. Tap **PusoAlalay-v1.1.apk** to download it.
 3. Open the file and allow "Install unknown apps" when Android asks.
 4. If Play Protect warns about an unknown developer, choose "Install anyway". This is expected for a personal debug build.
 
