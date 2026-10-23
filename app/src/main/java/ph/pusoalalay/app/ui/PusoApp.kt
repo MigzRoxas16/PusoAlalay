@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import ph.pusoalalay.app.*
+import ph.pusoalalay.app.R
 import ph.pusoalalay.app.data.Settings
 import ph.pusoalalay.app.domain.*
 import java.time.LocalDate
