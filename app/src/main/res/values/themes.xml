@@ -1,0 +1,9 @@
+<resources>
+    <style name="Theme.PusoAlalay" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:windowBackground">#101B1B</item>
+        <item name="android:colorAccent">#96D4C3</item>
+    </style>
+</resources>
