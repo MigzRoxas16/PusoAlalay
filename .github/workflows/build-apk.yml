@@ -4,6 +4,9 @@ on:
   push:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-24.04
@@ -55,6 +58,20 @@ jobs:
         with:
           name: PusoAlalay-v1.1-debug
           path: dist/
+
+      - name: Publish APK as a GitHub release
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.1
+          name: PusoAlalay 1.1 (debug build)
+          prerelease: false
+          make_latest: true
+          files: dist/PusoAlalay-v1.1-debug.apk
+          body: |
+            Debug build for personal installation and testing on Android 8.0 or later.
+            Download PusoAlalay-v1.1-debug.apk on your phone, open it, and allow installing unknown apps.
+            Academic prototype: a personal health journal, not a diagnostic or medical device.
 
       # Runs after the APK is uploaded, so a lint failure never hides the APK, but it does mark the run as failed.
       - name: Lint

@@ -1,0 +1,93 @@
+{
+  "kind": "source-only audit",
+  "android_compiled": false,
+  "unit_tests_executed": false,
+  "device_tests_executed": false,
+  "checks": [
+    {
+      "check": "XML well-formedness",
+      "passed": true,
+      "detail": "8 files"
+    },
+    {
+      "check": "No duplicate strings: values",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "No duplicate strings: values-b+fil",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "English / Filipino key parity",
+      "passed": true,
+      "detail": "215 keys in each language"
+    },
+    {
+      "check": "Translation format placeholders",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "String references resolve",
+      "passed": true,
+      "detail": "207 distinct references; missing=[]"
+    },
+    {
+      "check": "Kotlin lexical delimiter balance",
+      "passed": true,
+      "detail": "27 Kotlin files; not a compiler test"
+    },
+    {
+      "check": "Minimal declared permissions",
+      "passed": true,
+      "detail": "android.permission.POST_NOTIFICATIONS, android.permission.RECEIVE_BOOT_COMPLETED"
+    },
+    {
+      "check": "Automatic backup disabled",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "Receivers are not externally exported",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "Cloud and device transfer exclusions",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "Manifest component names exist",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "Gradle wrapper SHA-256",
+      "passed": true,
+      "detail": "Compared with https://gradle.org/release-checksums/ (Gradle 8.11.1)"
+    },
+    {
+      "check": "Wrapper JAR archive integrity",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "Gradle distribution checksum pinned",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "Specified text color pairs >= 4.5:1",
+      "passed": true,
+      "detail": "{\"body/panel\": 12.67, \"secondary/panel\": 8.63, \"primary/on-primary\": 7.78}"
+    },
+    {
+      "check": "Test sources included",
+      "passed": true,
+      "detail": "38 declared tests; NOT EXECUTED"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+Build environment check #1: 23 October 2026 (original author's workspace)
+Command: gradlew.bat --version  ->  exit 1, "JAVA_HOME is not set".
+
+Build environment check #2: 23 October 2026 (revision workspace, Linux)
+- JDK present: OpenJDK 21.0.12 (project targets Java 17 bytecode; AGP 8.9.2 accepts JDK 17+).
+- Android SDK: not installed.
+- Network: HTTPS CONNECT to dl.google.com, maven.google.com, services.gradle.org,
+  plugins.gradle.org, repo.maven.apache.org and repo1.maven.org was refused (HTTP 403) by the
+  workspace egress policy. Gradle 8.11.1, AGP, Compose, Room and the SDK could not be downloaded.
+- Result: :app:assembleDebug, lintDebug and connected tests were NOT run. No APK was produced.
+
+What was actually executed:
+- app/src/test/.../HealthRecordTest.kt + domain/HealthRecord.kt compiled with the Kotlin 2.0.21
+  compiler bundled in Gradle 8.14.3, run with JUnit 4.13.2:  "OK (13 tests)".
+  (The project itself pins Kotlin 2.1.10; the full Gradle build must repeat these tests.)
+- Static checks: every R.string reference exists in English and Filipino; format placeholders match.
+- gradle-wrapper.jar is a valid 33-entry JAR.
+
+Next step: run .github/workflows/build-apk.yml on GitHub, or build in Android Studio (README).
+
+Build #3 and later: GitHub Actions (ubuntu-24.04, JDK 17, Gradle 8.11.1)
+- v1.0 debug APK built on 23 Oct 2026 after fixing an ambiguous R import in PusoApp.kt.
+- v1.1 debug APK built on 23 Oct 2026: 33 unit tests, lint (blocking) and APK verification passed.
