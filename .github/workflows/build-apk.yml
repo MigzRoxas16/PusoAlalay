@@ -44,13 +44,16 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/aapt2" dump badging "$APK" | head -n 3
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --print-certs "$APK"
           mkdir -p dist
-          cp "$APK" dist/PusoAlalay-v1.0-debug.apk
-          sha256sum dist/PusoAlalay-v1.0-debug.apk | tee dist/PusoAlalay-v1.0-debug.apk.sha256
+          cp "$APK" dist/PusoAlalay-v1.1-debug.apk
+          sha256sum dist/PusoAlalay-v1.1-debug.apk | tee dist/PusoAlalay-v1.1-debug.apk.sha256
+
+      - name: Show Room schema (checks the 1 to 2 migration)
+        run: cat app/schemas/ph.pusoalalay.app.data.HealthDatabase/2.json || true
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: PusoAlalay-v1.0-debug
+          name: PusoAlalay-v1.1-debug
           path: dist/
 
       - name: Lint (reported, does not block the APK)

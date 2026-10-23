@@ -41,6 +41,18 @@ class HealthRecordTest {
             measuredAt = now, note = "   "), now))
         assertNull(RecordValidator.validate(HealthRecord(kind = RecordKind.SYMPTOM, measuredAt = now, note = "Pagod pagkatapos maglakad."), now))
     }
+    @Test fun symptomChecklistIsEnoughWithoutNote() {
+        val record = HealthRecord(kind = RecordKind.SYMPTOM, measuredAt = now,
+            symptoms = setOf(Symptom.FATIGUE, Symptom.DIZZINESS), severity = 2)
+        assertNull(RecordValidator.validate(record, now))
+        assertEquals(ValidationIssue.INVALID_NUMBER, RecordValidator.validate(record.copy(severity = 4), now))
+    }
+    @Test fun csvIncludesSymptomsAndSeverity() {
+        val text = csvReport(listOf(HealthRecord(kind = RecordKind.SYMPTOM, measuredAt = now,
+            symptoms = setOf(Symptom.SWELLING, Symptom.FATIGUE), severity = 1)))
+        assertTrue(text.contains("\"FATIGUE;SWELLING\""))
+        assertTrue(text.contains("\"1\""))
+    }
     @Test fun rejectsFutureAndExcessiveNotes() {
         assertEquals(ValidationIssue.FUTURE_DATE, RecordValidator.validate(pulse().copy(measuredAt = now + 120_000), now))
         assertEquals(ValidationIssue.NOTE_TOO_LONG, RecordValidator.validate(pulse().copy(note = "x".repeat(2001)), now))

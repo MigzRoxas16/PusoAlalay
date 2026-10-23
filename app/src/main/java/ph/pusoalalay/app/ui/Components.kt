@@ -19,6 +19,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import ph.pusoalalay.app.R
 import ph.pusoalalay.app.domain.*
+import ph.pusoalalay.app.export.ReportExporter
 import java.time.Instant
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -36,6 +37,20 @@ fun RecordKind.icon(): ImageVector = when (this) {
     RecordKind.WEIGHT -> Icons.Outlined.MonitorWeight
     RecordKind.SYMPTOM -> Icons.Outlined.EditNote
 }
+@StringRes
+fun Symptom.label(): Int = ReportExporter.symptomLabel(this)
+
+@StringRes
+fun severityLabel(level: Int): Int = ReportExporter.severityLabel(level)
+
+/** "Fatigue · Dizziness · Moderate" for symptom entries; empty when nothing was ticked. */
+@Composable
+fun symptomSummary(record: HealthRecord): String {
+    val names = record.symptoms.sortedBy { it.ordinal }.map { stringResource(it.label()) }
+    val severity = record.severity?.let { stringResource(severityLabel(it)) }
+    return (names + listOfNotNull(severity)).joinToString(" · ")
+}
+
 fun formatTime(millis: Long, language: String, pattern: String = "dd MMM yyyy, h:mm a"): String =
     DateTimeFormatter.ofPattern(pattern, Locale.forLanguageTag(language)).withZone(MANILA).format(Instant.ofEpochMilli(millis))
 
@@ -45,7 +60,7 @@ fun SectionTitle(text: String) {
 }
 
 @Composable
-fun RecordRow(record: HealthRecord, language: String, onClick: () -> Unit) {
+fun RecordRow(record: HealthRecord, language: String, unusual: Boolean = false, onClick: () -> Unit) {
     OutlinedCard(onClick = onClick, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(18.dp)) {
         Row(Modifier.padding(16.dp), horizontalArrangement = Arrangement.spacedBy(14.dp)) {
             Icon(record.kind.icon(), contentDescription = null, tint = Mint, modifier = Modifier.padding(top = 4.dp).size(24.dp))
@@ -53,7 +68,14 @@ fun RecordRow(record: HealthRecord, language: String, onClick: () -> Unit) {
                 Text(stringResource(record.kind.label()), style = MaterialTheme.typography.titleMedium)
                 if (record.kind != RecordKind.SYMPTOM)
                     Text(record.numberText() + " " + record.kind.unit(), style = MaterialTheme.typography.titleLarge)
-                else Text(record.note, maxLines = 3, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+                else {
+                    val summary = symptomSummary(record)
+                    if (summary.isNotEmpty()) Text(summary, style = MaterialTheme.typography.titleSmall)
+                    if (record.note.isNotBlank())
+                        Text(record.note, maxLines = 3, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+                }
+                if (unusual) Text(stringResource(R.string.unusual_tag), style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.secondary)
                 Text(formatTime(record.measuredAt, language), style = MaterialTheme.typography.bodySmall, color = Muted)
                 Text(stringResource(if (record.source == MeasurementSource.SELF_REPORTED)
                     R.string.source_self else R.string.source_device), style = MaterialTheme.typography.bodySmall, color = Muted)
@@ -121,5 +143,29 @@ fun Trend(records: List<HealthRecord>, kind: RecordKind, language: String) {
             Text(formatTime(data.last().measuredAt, language, "dd MMM"), style = MaterialTheme.typography.bodySmall, color = Muted)
         }
         if (kind == RecordKind.BLOOD_PRESSURE) Text(stringResource(R.string.trend_legend), style = MaterialTheme.typography.bodySmall)
+    }
+}
+
+/** Personal descriptive statistics for one measurement type. Not compared with any clinical range. */
+@Composable
+fun StatsCard(records: List<HealthRecord>, kind: RecordKind, unusualCount: Int) {
+    val series = records.filter { it.kind == kind && it.value != null }.sortedBy { it.measuredAt }
+    val summary = summarize(series) ?: return
+    val p = summary.primary
+    val s = summary.secondary
+    val unit = kind.unit()
+    val days = coverage(series.map { it.measuredAt }, System.currentTimeMillis())
+    Column(Modifier.fillMaxWidth().background(Panel, RoundedCornerShape(20.dp)).padding(20.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Text(stringResource(R.string.stats_title), style = MaterialTheme.typography.titleMedium)
+        Text(stringResource(R.string.stats_count, p.count))
+        Text(stringResource(R.string.stats_average, formatPair(p.mean, s?.mean), unit))
+        p.sd?.let { Text(stringResource(R.string.stats_variation, formatPair(it, s?.sd))) }
+        Text(stringResource(R.string.stats_median, formatPair(p.median, s?.median)))
+        Text(stringResource(R.string.stats_range, formatPair(p.min, s?.min), formatPair(p.max, s?.max), unit))
+        days?.let { Text(stringResource(R.string.stats_coverage, it.daysWithData, it.totalDays)) }
+        Text(stringResource(R.string.stats_unusual, unusualCount),
+            color = if (unusualCount > 0) MaterialTheme.colorScheme.secondary else Cream)
+        Text(stringResource(R.string.stats_explain), style = MaterialTheme.typography.bodySmall, color = Muted)
     }
 }

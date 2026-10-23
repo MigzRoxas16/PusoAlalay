@@ -25,7 +25,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun RecordForm(initial: HealthRecord?, initialKind: RecordKind, language: String, busy: Boolean,
     onCancel: () -> Unit, onSave: (HealthRecord) -> Unit) {
@@ -55,6 +55,11 @@ fun RecordForm(initial: HealthRecord?, initialKind: RecordKind, language: String
     }
     var secondary by rememberSaveable { mutableStateOf(initial?.secondary?.toInt()?.toString().orEmpty()) }
     var note by rememberSaveable { mutableStateOf(initial?.note.orEmpty()) }
+    var symptomNames by rememberSaveable {
+        mutableStateOf(initial?.symptoms.orEmpty().sortedBy { it.ordinal }.joinToString(",") { it.name })
+    }
+    val symptoms = Symptom.entries.filter { it.name in symptomNames.split(',') }.toSet()
+    var severity by rememberSaveable { mutableIntStateOf(initial?.severity ?: 0) }
     var error by rememberSaveable { mutableStateOf<String?>(null) }
     var dirty by rememberSaveable { mutableStateOf(false) }
     var discard by rememberSaveable { mutableStateOf(false) }
@@ -87,6 +92,29 @@ fun RecordForm(initial: HealthRecord?, initialKind: RecordKind, language: String
                         label = { Text(stringResource(R.string.diastolic)) }, suffix = { Text("mmHg") },
                         singleLine = true, enabled = !busy, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
             }
+            if (kind == RecordKind.SYMPTOM) {
+                Text(stringResource(R.string.symptom_pick), style = MaterialTheme.typography.titleMedium)
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Symptom.entries.forEach { symptom ->
+                        FilterChip(selected = symptom in symptoms, onClick = {
+                            val next = if (symptom in symptoms) symptoms - symptom else symptoms + symptom
+                            symptomNames = next.sortedBy { it.ordinal }.joinToString(",") { it.name }
+                            dirty = true; error = null
+                        }, label = { Text(stringResource(symptom.label())) }, enabled = !busy)
+                    }
+                }
+                Text(stringResource(R.string.severity_label), style = MaterialTheme.typography.titleMedium)
+                Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    (1..3).forEach { level ->
+                        FilterChip(selected = severity == level, onClick = {
+                            severity = if (severity == level) 0 else level
+                            dirty = true; error = null
+                        }, label = { Text(stringResource(severityLabel(level))) }, enabled = !busy)
+                    }
+                }
+                Text(stringResource(R.string.emergency_note), style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error)
+            }
             Text(stringResource(R.string.measured_at), style = MaterialTheme.typography.titleMedium)
             val selected = Instant.ofEpochMilli(measuredAt).atZone(MANILA)
             OutlinedButton(onClick = {
@@ -110,7 +138,7 @@ fun RecordForm(initial: HealthRecord?, initialKind: RecordKind, language: String
             }
             Text(stringResource(R.string.manila_time), style = MaterialTheme.typography.bodySmall, color = Muted)
             OutlinedTextField(note, { note = it; dirty = true; error = null }, modifier = Modifier.fillMaxWidth().testTag("record_note"),
-                label = { Text(stringResource(if (kind == RecordKind.SYMPTOM) R.string.notes else R.string.notes_optional)) },
+                label = { Text(stringResource(R.string.notes_optional)) },
                 placeholder = { Text(stringResource(R.string.notes_hint)) }, minLines = 3, maxLines = 8, enabled = !busy,
                 supportingText = { Text(stringResource(R.string.note_counter, note.length)) }, isError = note.length > 2000)
             error?.let {
@@ -135,7 +163,9 @@ fun RecordForm(initial: HealthRecord?, initialKind: RecordKind, language: String
                     val record = HealthRecord(id, kind, measuredAt,
                         if (kind == RecordKind.SYMPTOM) null else first,
                         if (kind == RecordKind.BLOOD_PRESSURE) second else null, note.trim(),
-                        if (kind == RecordKind.SYMPTOM) MeasurementSource.SELF_REPORTED else MeasurementSource.DEVICE_MANUAL, createdAt)
+                        if (kind == RecordKind.SYMPTOM) MeasurementSource.SELF_REPORTED else MeasurementSource.DEVICE_MANUAL, createdAt,
+                        if (kind == RecordKind.SYMPTOM) symptoms else emptySet(),
+                        if (kind == RecordKind.SYMPTOM && severity in 1..3) severity else null)
                     val issue = RecordValidator.validate(record)
                     if (issue != null) error = issue.name else onSave(record)
                 }

@@ -4,11 +4,16 @@ import android.Manifest
 import android.app.*
 import android.content.*
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import ph.pusoalalay.app.MainActivity
+import ph.pusoalalay.app.PusoApplication
 import ph.pusoalalay.app.R
 import ph.pusoalalay.app.data.Settings
 import ph.pusoalalay.app.data.localizedContext
@@ -21,6 +26,10 @@ object Reminders {
 
     private fun pending(context: Context) = PendingIntent.getBroadcast(context, REQUEST,
         Intent(context, ReminderReceiver::class.java),
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+
+    private fun appointmentPending(context: Context, id: String) = PendingIntent.getBroadcast(context, id.hashCode(),
+        Intent(context, AppointmentReceiver::class.java).setData(Uri.parse("pusoalalay://appointment/$id")),
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
     fun channel(context: Context) {
@@ -58,7 +67,19 @@ object Reminders {
         NotificationManagerCompat.from(context).cancel(REQUEST)
     }
 
-    fun notify(context: Context) {
+    /** Appointment reminders are approximate (10-minute window) and never change any treatment schedule. */
+    fun scheduleAppointment(context: Context, id: String, remindAt: Long) {
+        if (remindAt <= System.currentTimeMillis()) return
+        context.getSystemService(AlarmManager::class.java)
+            .setWindow(AlarmManager.RTC_WAKEUP, remindAt, 10 * 60_000L, appointmentPending(context, id))
+    }
+
+    fun cancelAppointment(context: Context, id: String) {
+        context.getSystemService(AlarmManager::class.java).cancel(appointmentPending(context, id))
+        NotificationManagerCompat.from(context).cancel(id.hashCode())
+    }
+
+    private fun post(context: Context, notificationId: Int, title: Int, body: Int) {
         channel(context)
         if (!allowed(context)) return
         val local = localizedContext(context)
@@ -67,13 +88,19 @@ object Reminders {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         val notification = NotificationCompat.Builder(context, CHANNEL)
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle(local.getString(R.string.app_name))
-            .setContentText(local.getString(R.string.reminder_body))
+            .setContentTitle(local.getString(title))
+            .setContentText(local.getString(body))
             .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
             .setContentIntent(contentIntent).setAutoCancel(true).build()
-        try { NotificationManagerCompat.from(context).notify(REQUEST, notification) }
+        try { NotificationManagerCompat.from(context).notify(notificationId, notification) }
         catch (_: SecurityException) { /* Permission may be revoked after the check. */ }
     }
+
+    fun notify(context: Context) = post(context, REQUEST, R.string.app_name, R.string.reminder_body)
+
+    /** The notification never shows the appointment title, so nothing private appears on the screen. */
+    fun notifyAppointment(context: Context, id: String) =
+        post(context, id.hashCode(), R.string.appointment_notification_title, R.string.appointment_notification_body)
 }
 
 class ReminderReceiver : BroadcastReceiver() {
@@ -84,12 +111,31 @@ class ReminderReceiver : BroadcastReceiver() {
     }
 }
 
+class AppointmentReceiver : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {
+        val id = intent.data?.lastPathSegment ?: return
+        Reminders.notifyAppointment(context, id)
+    }
+}
+
 class RestoreReminderReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action in setOf(Intent.ACTION_BOOT_COMPLETED, Intent.ACTION_MY_PACKAGE_REPLACED,
                 Intent.ACTION_TIME_CHANGED, Intent.ACTION_TIMEZONE_CHANGED)) {
             Reminders.channel(context)
             Reminders.schedule(context)
+            val app = context.applicationContext as PusoApplication
+            val result = goAsync()
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    app.database.appointments().pendingReminders(System.currentTimeMillis())
+                        .forEach { Reminders.scheduleAppointment(app, it.id, it.remindAt) }
+                } catch (_: Exception) {
+                    // Reminders are rescheduled again the next time the app opens.
+                } finally {
+                    result.finish()
+                }
+            }
         }
     }
 }

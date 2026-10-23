@@ -113,6 +113,8 @@ fun HistoryScreen(records: List<HealthRecord>, language: String, busy: Boolean,
         .atStartOfDay(MANILA).toInstant().toEpochMilli()
     val selected = records.filter { (filter == "ALL" || it.kind.name == filter) &&
         it.measuredAt >= cutoff && it.note.contains(search, ignoreCase = true) }
+    // Each reading is compared with the same person's earlier readings, using the whole history.
+    val unusual = remember(records) { unusualRecords(records) }
     LazyColumn(contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item {
             Text(stringResource(R.string.records), style = MaterialTheme.typography.headlineLarge)
@@ -137,8 +139,9 @@ fun HistoryScreen(records: List<HealthRecord>, language: String, busy: Boolean,
             OutlinedTextField(search, { search = it }, label = { Text(stringResource(R.string.search_notes)) },
                 singleLine = true, leadingIcon = { Icon(Icons.Outlined.Search, null) }, modifier = Modifier.fillMaxWidth())
         }
-        if (filter != "ALL" && filter != RecordKind.SYMPTOM.name) item {
-            Trend(selected, RecordKind.valueOf(filter), language)
+        if (filter != "ALL" && filter != RecordKind.SYMPTOM.name) {
+            item { StatsCard(selected, RecordKind.valueOf(filter), selected.count { it.id in unusual }) }
+            item { Trend(selected, RecordKind.valueOf(filter), language) }
         }
         item {
             OutlinedButton(onClick = { onExport(selected) }, enabled = selected.isNotEmpty() && !busy,
@@ -153,7 +156,7 @@ fun HistoryScreen(records: List<HealthRecord>, language: String, busy: Boolean,
             Text(stringResource(R.string.no_results), modifier = Modifier.padding(vertical = 16.dp))
             TextButton(onClick = { filter = "ALL"; days = 0; search = "" }) { Text(stringResource(R.string.clear_filters)) }
         }
-        items(selected, key = { it.id }) { record -> RecordRow(record, language) { onRecord(record) } }
+        items(selected, key = { it.id }) { record -> RecordRow(record, language, record.id in unusual) { onRecord(record) } }
         item { Spacer(Modifier.height(76.dp)) }
     }
 }

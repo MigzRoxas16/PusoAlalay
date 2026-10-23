@@ -18,6 +18,14 @@ class Settings(context: Context) {
     var reminderHour: Int
         get() = prefs.getInt("reminderHour", 19)
         set(value) { prefs.edit().putInt("reminderHour", value).apply() }
+    /** The signed-in local account, or null when signed out. */
+    var currentUserId: String?
+        get() = prefs.getString("currentUserId", null)
+        set(value) {
+            val editor = prefs.edit()
+            if (value == null) editor.remove("currentUserId") else editor.putString("currentUserId", value)
+            editor.apply()
+        }
     var reminderMinute: Int
         get() = prefs.getInt("reminderMinute", 0)
         set(value) { prefs.edit().putInt("reminderMinute", value).apply() }
