@@ -56,8 +56,8 @@ jobs:
           name: PusoAlalay-v1.1-debug
           path: dist/
 
-      - name: Lint (reported, does not block the APK)
-        continue-on-error: true
+      # Runs after the APK is uploaded, so a lint failure never hides the APK, but it does mark the run as failed.
+      - name: Lint
         run: gradle --no-daemon :app:lintDebug
 
       - name: Upload test and lint reports
