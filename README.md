@@ -2,16 +2,16 @@
 
 A Filipino and English heart-health journal for Android, built with Kotlin and Jetpack Compose. It is an academic thesis prototype: a personal record-keeping tool, not a diagnostic or medical device.
 
-**Status (23 October 2026): version 1.1 builds and passes its automated checks on GitHub Actions** (33 unit tests, lint, APK verification). It has not yet been tested on a phone or emulator. See docs/BUILD_REPORT.md.
+**Status (24 October 2026): version 1.2 adds the research demo from the course paper.** Version 1.1 built and passed its automated checks on GitHub Actions; 1.2 has 43 unit tests that pass locally and must still be built in CI. It has not yet been tested on a phone or emulator. See docs/BUILD_REPORT.md.
 
 ## Install on your phone
 
 1. On your phone, open the latest release: https://github.com/MigzRoxas16/PusoAlalay/releases/latest
-2. Tap **PusoAlalay-v1.1.apk** to download it.
+2. Tap **PusoAlalay-v1.2.apk** to download it.
 3. Open the file and allow "Install unknown apps" when Android asks.
 4. If Play Protect warns about an unknown developer, choose "Install anyway". This is expected for a personal debug build.
 
-Requires Android 8.0 or later. Version 1.1 installs over 1.0 and keeps existing records (they move into the first account you create).
+Requires Android 8.0 or later. Each version installs over the previous one and keeps existing records (they move into the first account you create).
 
 ## Features
 
@@ -24,8 +24,9 @@ Requires Android 8.0 or later. Version 1.1 installs over 1.0 and keeps existing 
 - **Reports:** PDF with summary statistics, graphs, missing-data notes, symptom counts and all entries; CSV for spreadsheets. Saved only where you choose.
 - **Privacy:** works fully offline with no internet permission. Values, notes and appointment details are encrypted with an Android Keystore key. Backups are disabled and screenshots are blocked.
 - **Languages and theme:** Filipino and English; dark theme.
+- **Research demo (Settings → About the research):** reproduces the course paper's experiment on recorded pulse signals. Import pulse1.csv, pulse3.csv and pulse5.csv (Pathak et al., 2020); the app cuts 256-value windows in 128-value steps, adds four artificial disturbances (noise, spikes, 48-point flat line, baseline drift), computes six features, and compares a standardised nearest-centroid classifier with the 0.12 flat-line rule on the held-out recording. It also runs the 8-scale × 30-draw noise-sensitivity test. Results are shown beside the archived Table 1 and Table 2. Data-quality research only; it never touches health records.
 
-Not included: smartwatch / Health Connect import, PPG signal-quality analysis (research only), cloud sync, medication tracking, clinical alerts.
+Not included: smartwatch / Health Connect import, live pulse sensing, cloud sync, medication tracking, clinical alerts.
 
 ## How the APK is built
 

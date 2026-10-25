@@ -39,6 +39,7 @@ fun PusoApp(model: HealthViewModel, settings: Settings, onLanguageChanged: () ->
     var onboarded by rememberSaveable { mutableStateOf(settings.onboardingDone) }
     var tab by rememberSaveable { mutableIntStateOf(0) }
     var research by rememberSaveable { mutableStateOf(false) }
+    var lab by rememberSaveable { mutableStateOf(false) }
     var editor by rememberSaveable { mutableStateOf<String?>(null) }
     var initialKind by rememberSaveable { mutableStateOf(RecordKind.HEART_RATE.name) }
     var detail by rememberSaveable { mutableStateOf<String?>(null) }
@@ -59,7 +60,7 @@ fun PusoApp(model: HealthViewModel, settings: Settings, onLanguageChanged: () ->
         initialKind = kind.name; editor = "NEW"; detail = null
     }
     fun resetNavigation() {
-        tab = 0; editor = null; detail = null; research = false; deleting = null; clearAll = false
+        tab = 0; editor = null; detail = null; research = false; lab = false; deleting = null; clearAll = false
         appointmentDialog = false; deletingAppointment = null; deletingAccount = false; exportSelection = null
     }
     LaunchedEffect(model, context) {
@@ -87,7 +88,7 @@ fun PusoApp(model: HealthViewModel, settings: Settings, onLanguageChanged: () ->
     val pdf = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/pdf")) { uri -> model.finishExport(uri, true) }
 
     BackHandler(enabled = editor == null && (detail != null || research || tab != 0)) {
-        when { detail != null -> detail = null; research -> research = false; else -> tab = 0 }
+        when { detail != null -> detail = null; lab -> lab = false; research -> research = false; else -> tab = 0 }
     }
     Scaffold(snackbarHost = { SnackbarHost(snackbar) }, contentWindowInsets = WindowInsets(0, 0, 0, 0)) { outerPadding ->
         Box(Modifier.fillMaxSize().padding(outerPadding)) {
@@ -124,7 +125,7 @@ fun PusoApp(model: HealthViewModel, settings: Settings, onLanguageChanged: () ->
                                     style = MaterialTheme.typography.labelSmall, color = Muted)
                             }
                         }, navigationIcon = {
-                            if (research) IconButton(onClick = { research = false }) {
+                            if (research) IconButton(onClick = { if (lab) lab = false else research = false }) {
                                 Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.back))
                             }
                         }, actions = {
@@ -134,7 +135,7 @@ fun PusoApp(model: HealthViewModel, settings: Settings, onLanguageChanged: () ->
                     bottomBar = {
                         NavigationBar {
                             labels.forEachIndexed { index, label ->
-                                NavigationBarItem(selected = tab == index && !research, onClick = { tab = index; research = false },
+                                NavigationBarItem(selected = tab == index && !research, onClick = { tab = index; research = false; lab = false },
                                     icon = { Icon(icons[index], null) }, label = { Text(stringResource(label)) })
                             }
                         }
@@ -148,7 +149,7 @@ fun PusoApp(model: HealthViewModel, settings: Settings, onLanguageChanged: () ->
                 ) { innerPadding ->
                     Box(Modifier.fillMaxSize().padding(innerPadding)) {
                         when {
-                            research -> ResearchScreen()
+                            research -> if (lab) ResearchLabScreen() else ResearchScreen { lab = true }
                             tab <= 1 && state.loading -> Column(Modifier.align(Alignment.Center).padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.spacedBy(16.dp)) {
                                 CircularProgressIndicator(); Text(stringResource(R.string.loading))

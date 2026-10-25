@@ -234,13 +234,16 @@ fun SettingsScreen(language: String, busy: Boolean, user: AccountSummary, onLang
 }
 
 @Composable
-fun ResearchScreen() {
+fun ResearchScreen(onOpenLab: () -> Unit) {
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
         Text(stringResource(R.string.research_title), style = MaterialTheme.typography.headlineLarge)
         Text(stringResource(R.string.research_body), color = Muted)
         HorizontalDivider()
         Text(stringResource(R.string.research_metrics))
         Text(stringResource(R.string.research_limits), color = Muted)
+        Button(onClick = onOpenLab, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
+            Text(stringResource(R.string.lab_open))
+        }
         Text(stringResource(R.string.version_label), style = MaterialTheme.typography.bodySmall, color = Muted)
     }
 }
