@@ -2,12 +2,12 @@
 
 A Filipino and English heart-health journal for Android, built with Kotlin and Jetpack Compose. It is an academic thesis prototype: a personal record-keeping tool, not a diagnostic or medical device.
 
-**Status (24 October 2026): version 1.2 adds the research demo from the course paper.** Version 1.1 built and passed its automated checks on GitHub Actions; 1.2 has 43 unit tests that pass locally and must still be built in CI. It has not yet been tested on a phone or emulator. See docs/BUILD_REPORT.md.
+**Status (25 October 2026): version 1.2.1 puts the research demo in its own Research tab and adds graphs.** Each imported pulse recording is plotted right away, ML and the rule are compared in a bar chart, and the PDF gets a symptom bar chart and a note explaining when a measurement graph appears. Every version is built and checked on GitHub Actions. It has not yet been tested on a phone or emulator. See docs/BUILD_REPORT.md.
 
 ## Install on your phone
 
 1. On your phone, open the latest release: https://github.com/MigzRoxas16/PusoAlalay/releases/latest
-2. Tap **PusoAlalay-v1.2.apk** to download it.
+2. Tap **PusoAlalay-v1.2.1.apk** to download it.
 3. Open the file and allow "Install unknown apps" when Android asks.
 4. If Play Protect warns about an unknown developer, choose "Install anyway". This is expected for a personal debug build.
 
@@ -21,10 +21,10 @@ Requires Android 8.0 or later. Each version installs over the previous one and k
 - **Symptom tracking:** checklist (fatigue, dizziness, palpitations, shortness of breath, swelling, chest discomfort), severity (mild, moderate, severe) and notes, with an emergency-care notice.
 - **Personal trend statistics:** average, typical variation (SD), median, range and days-with-data coverage. Readings far from your own earlier readings are marked "unusual compared with your earlier readings" (modified z-score above 3.5 after at least 5 earlier readings). This is a prompt to review, not a diagnosis.
 - **Reminders:** one daily logging reminder, plus appointment reminders 1 hour, 2 hours or 1 day before. Notifications never show health details or appointment titles.
-- **Reports:** PDF with summary statistics, graphs, missing-data notes, symptom counts and all entries; CSV for spreadsheets. Saved only where you choose.
+- **Reports:** PDF with summary statistics, line graphs (for any type with 2 or more readings), missing-data notes, a symptom bar chart and all entries. The export uses the entries currently shown in Records, and the dialog shows how many; CSV for spreadsheets. Saved only where you choose.
 - **Privacy:** works fully offline with no internet permission. Values, notes and appointment details are encrypted with an Android Keystore key. Backups are disabled and screenshots are blocked.
 - **Languages and theme:** Filipino and English; dark theme.
-- **Research demo (Settings → About the research):** reproduces the course paper's experiment on recorded pulse signals. Import pulse1.csv, pulse3.csv and pulse5.csv (Pathak et al., 2020); the app cuts 256-value windows in 128-value steps, adds four artificial disturbances (noise, spikes, 48-point flat line, baseline drift), computes six features, and compares a standardised nearest-centroid classifier with the 0.12 flat-line rule on the held-out recording. It also runs the 8-scale × 30-draw noise-sensitivity test. Results are shown beside the archived Table 1 and Table 2. Data-quality research only; it never touches health records.
+- **Research demo (Research tab):** reproduces the course paper's experiment on recorded pulse signals. Import pulse1.csv, pulse3.csv and pulse5.csv (Pathak et al., 2020); the app cuts 256-value windows in 128-value steps, adds four artificial disturbances (noise, spikes, 48-point flat line, baseline drift), computes six features, and compares a standardised nearest-centroid classifier with the 0.12 flat-line rule on the held-out recording. It also runs the 8-scale × 30-draw noise-sensitivity test. Each imported recording is drawn as a graph (first 768 values), ML and the rule are shown as a bar chart and tables beside the archived Table 1 and Table 2, and a window viewer overlays each original window with its noise, spike, flat-line or drift version. Data-quality research only; it never touches health records.
 
 Not included: smartwatch / Health Connect import, live pulse sensing, cloud sync, medication tracking, clinical alerts.
 

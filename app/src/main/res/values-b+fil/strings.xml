@@ -213,7 +213,6 @@
     <string name="report_missing_note">Walang laman ang mga araw na walang sukat. Hindi tinatantiya o pinupunan ang nawawalang datos.</string>
     <string name="report_no_data">Walang ganitong uri ng sukat sa ulat na ito.</string>
     <string name="report_no_symptoms">Walang tala ng sintomas sa ulat na ito.</string>
-    <string name="report_symptom_summary">%1$s: %2$d tala</string>
     <string name="report_entries_title">Lahat ng tala</string>
     <string name="lab_open">Buksan ang research demo</string>
     <string name="lab_title">Research demo: artipisyal na pagbabago sa naitalang pulse signals</string>
@@ -278,4 +277,12 @@
     <string name="lab_limits_title">Mga limitasyon</string>
     <string name="lab_limits">Ang labels ay nagsasabi lang kung aling window ang binago ng program; hindi ito expert artifact labels. Tatlong recording, magkakapatong na windows, hindi alam na sampling rate at 4:1 na class imbalance ang naglilimita sa kahulugan ng mga numero. Walang tinatantiyang heart rate, walang natutukoy na sakit, at hindi ito kapalit ng medikal na pangangalaga.</string>
     <string name="lab_citation">Data: N. Pathak, A. Mukherjee at S. Misra, Reconfigure and Reuse: Interoperable Wearables for Healthcare IoT, IEEE INFOCOM 2020, doi 10.1109/INFOCOM41043.2020.9155398; Reconfigure-Reuse-Dataset sa GitHub.</string>
+    <string name="nav_research">Pag-aaral</string>
+    <string name="lab_plot_caption">Unang %1$d sa %2$d values. Bawat taas-baba ay isang tibok ng puso sa recording.</string>
+    <string name="lab_plot_a11y">Graph ng unang %2$d values ng %1$s</string>
+    <string name="lab_bars_title">ML laban sa rule sa hiwalay na test recording (mas mataas, mas mahusay)</string>
+    <string name="report_graph_hint">Lalabas ang graph kapag may hindi bababa sa 2 reading ng uring ito sa report.</string>
+    <string name="report_symptom_chart">Bilang ng tala na bumabanggit sa bawat sintomas:</string>
+    <string name="export_count">Mga tala sa export na ito: %1$d</string>
+    <string name="export_filter_note">Ang mga talang nakikita lang sa Mga Tala ang ie-export. Para isama lahat, i-tap ang Lahat ng uri at alisin muna ang filter ng panahon at paghahanap.</string>
 </resources>

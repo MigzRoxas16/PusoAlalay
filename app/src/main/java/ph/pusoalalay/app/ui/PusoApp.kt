@@ -4,6 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -113,14 +114,15 @@ fun PusoApp(model: HealthViewModel, settings: Settings, onLanguageChanged: () ->
                         onCancel = { editor = null }, onSave = { model.save(it, existing != null) })
                 }
             } else {
-                val labels = listOf(R.string.nav_health, R.string.nav_records, R.string.nav_reminders, R.string.nav_more)
-                val icons = listOf(Icons.Outlined.FavoriteBorder, Icons.AutoMirrored.Outlined.MenuBook, Icons.Outlined.NotificationsNone, Icons.Outlined.Tune)
+                val labels = listOf(R.string.nav_health, R.string.nav_records, R.string.nav_reminders, R.string.nav_research, R.string.nav_more)
+                val icons = listOf(Icons.Outlined.FavoriteBorder, Icons.AutoMirrored.Outlined.MenuBook, Icons.Outlined.NotificationsNone, Icons.Outlined.Science, Icons.Outlined.Tune)
                 Scaffold(
                     topBar = {
                         TopAppBar(title = {
                             Column {
                                 Text("PusoAlalay", style = MaterialTheme.typography.titleLarge)
                                 Text(if (research) stringResource(R.string.research)
+                                    else if (tab == 3) stringResource(R.string.nav_research)
                                     else state.user?.displayName ?: stringResource(R.string.offline_label),
                                     style = MaterialTheme.typography.labelSmall, color = Muted)
                             }
@@ -149,7 +151,7 @@ fun PusoApp(model: HealthViewModel, settings: Settings, onLanguageChanged: () ->
                 ) { innerPadding ->
                     Box(Modifier.fillMaxSize().padding(innerPadding)) {
                         when {
-                            research -> if (lab) ResearchLabScreen() else ResearchScreen { lab = true }
+                            research -> if (lab) ResearchLabScreen() else ResearchScreen { research = false; lab = false; tab = 3 }
                             tab <= 1 && state.loading -> Column(Modifier.align(Alignment.Center).padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.spacedBy(16.dp)) {
                                 CircularProgressIndicator(); Text(stringResource(R.string.loading))
@@ -163,6 +165,7 @@ fun PusoApp(model: HealthViewModel, settings: Settings, onLanguageChanged: () ->
                                 { detail = it.id }, { exportSelection = it })
                             tab == 2 -> ReminderScreen(settings, ::message, state.appointments, language, state.busy,
                                 { appointmentDialog = true }, { deletingAppointment = it })
+                            tab == 3 -> ResearchLabScreen()
                             else -> state.user?.let { user ->
                                 SettingsScreen(language, state.busy, user, ::changeLanguage, { research = true }, { clearAll = true },
                                     model::signOut, { deletingAccount = true })
@@ -230,7 +233,13 @@ fun PusoApp(model: HealthViewModel, settings: Settings, onLanguageChanged: () ->
     }
     exportSelection?.let { snapshot ->
         AlertDialog(onDismissRequest = { exportSelection = null },
-            title = { Text(stringResource(R.string.export)) }, text = { Text(stringResource(R.string.export_notice)) },
+            title = { Text(stringResource(R.string.export)) }, text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(stringResource(R.string.export_count, snapshot.size), fontWeight = FontWeight.SemiBold)
+                    Text(stringResource(R.string.export_filter_note))
+                    Text(stringResource(R.string.export_notice))
+                }
+            },
             confirmButton = {
                 TextButton(onClick = {
                     model.prepareExport(snapshot); exportSelection = null

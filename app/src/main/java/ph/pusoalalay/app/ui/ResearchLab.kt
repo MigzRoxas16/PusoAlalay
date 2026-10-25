@@ -97,6 +97,65 @@ private fun RecordingRow(label: String, recording: SignalLab.Recording?, busy: B
             }
             OutlinedButton(onClick = onImport, enabled = !busy) { Text(stringResource(R.string.lab_import)) }
         }
+        if (recording != null) RecordingPlot(recording)
+    }
+}
+
+/** Plots the first values of an imported recording so the pulse waves are visible right after import (as in the paper's Figure 3). */
+@Composable
+private fun RecordingPlot(recording: SignalLab.Recording) {
+    val shown = minOf(recording.values.size, PLOT_SAMPLES)
+    val values = recording.values
+    val description = stringResource(R.string.lab_plot_a11y, recording.name, shown)
+    Column(Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Canvas(Modifier.fillMaxWidth().height(110.dp).background(Panel, RoundedCornerShape(12.dp)).semantics { contentDescription = description }) {
+            val pad = 8.dp.toPx()
+            var low = values[0]; var high = values[0]
+            for (i in 0 until shown) { low = minOf(low, values[i]); high = maxOf(high, values[i]) }
+            val spread = (high - low).coerceAtLeast(1e-9)
+            fun x(i: Int) = pad + i * (size.width - 2 * pad) / (shown - 1).coerceAtLeast(1)
+            fun y(v: Double) = (size.height - pad - (v - low) / spread * (size.height - 2 * pad)).toFloat()
+            val color = if (recording.synthetic) Sand else Mint
+            for (i in 1 until shown) drawLine(color, Offset(x(i - 1), y(values[i - 1])), Offset(x(i), y(values[i])), 1.2.dp.toPx())
+        }
+        Text(stringResource(R.string.lab_plot_caption, shown, values.size), style = MaterialTheme.typography.bodySmall, color = Muted)
+    }
+}
+
+private const val PLOT_SAMPLES = 768
+
+/** Grouped bars of the five measures for ML and the rule (as in the paper's Figure 2). */
+@Composable
+private fun MetricBars(title: String, model: SignalLab.Scores, rule: SignalLab.Scores) {
+    Column(Modifier.fillMaxWidth().background(Panel, RoundedCornerShape(16.dp)).padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Text(title, style = MaterialTheme.typography.titleSmall)
+        Row(horizontalArrangement = Arrangement.spacedBy(16.dp), verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.size(12.dp).background(Mint, RoundedCornerShape(3.dp)))
+            Text(stringResource(R.string.lab_ml), style = MaterialTheme.typography.bodySmall)
+            Box(Modifier.size(12.dp).background(Sand, RoundedCornerShape(3.dp)))
+            Text(stringResource(R.string.lab_rule), style = MaterialTheme.typography.bodySmall)
+        }
+        val measures = listOf(
+            stringResource(R.string.lab_precision) to (model.precision to rule.precision),
+            stringResource(R.string.lab_recall) to (model.recall to rule.recall),
+            stringResource(R.string.lab_specificity) to (model.specificity to rule.specificity),
+            "F1" to (model.f1 to rule.f1),
+            stringResource(R.string.lab_balanced) to (model.balancedAccuracy to rule.balancedAccuracy)
+        )
+        measures.forEach { (name, pair) ->
+            Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                Text(name, style = MaterialTheme.typography.labelMedium, color = Muted)
+                listOf(pair.first to Mint, pair.second to Sand).forEach { (value, color) ->
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Box(Modifier.weight(1f).height(12.dp).background(Cream.copy(alpha = 0.08f), RoundedCornerShape(3.dp))) {
+                            val fraction = if (value.isNaN()) 0f else value.toFloat().coerceIn(0f, 1f)
+                            if (fraction > 0f) Box(Modifier.fillMaxWidth(fraction).fillMaxHeight().background(color, RoundedCornerShape(3.dp)))
+                        }
+                        Text(f3(value), style = MaterialTheme.typography.bodySmall, fontFamily = FontFamily.Monospace)
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -151,6 +210,7 @@ private fun Confusion(title: String, s: SignalLab.Scores, modifier: Modifier) {
 private fun ClassifierResults(e: SignalLab.Evaluation, synthetic: Boolean) {
     Text(stringResource(R.string.lab_counts, e.trainingExamples, e.test.size))
     if (synthetic) Text(stringResource(R.string.lab_synthetic_warning), color = Sand, style = MaterialTheme.typography.bodySmall)
+    MetricBars(stringResource(R.string.lab_bars_title), e.model, e.rule)
     ScoresTable(stringResource(R.string.lab_this_run), e.model, e.rule)
     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         Confusion(stringResource(R.string.lab_ml), e.model, Modifier.weight(1f))

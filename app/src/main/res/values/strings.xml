@@ -213,7 +213,6 @@
     <string name="report_missing_note">Days without a reading are left blank. Missing values are not estimated or filled in.</string>
     <string name="report_no_data">No readings of this type in this report.</string>
     <string name="report_no_symptoms">No symptom entries in this report.</string>
-    <string name="report_symptom_summary">%1$s: %2$d entries</string>
     <string name="report_entries_title">All entries</string>
     <string name="lab_open">Open the research demo</string>
     <string name="lab_title">Research demo: artificial disturbances in recorded pulse signals</string>
@@ -278,4 +277,12 @@
     <string name="lab_limits_title">Limits</string>
     <string name="lab_limits">The labels only say which windows a program changed; they are not expert artifact labels. Three recordings, overlapping windows, an unknown sampling rate and a 4:1 class imbalance limit what the numbers mean. Nothing here estimates heart rate, detects disease or replaces medical care.</string>
     <string name="lab_citation">Data: N. Pathak, A. Mukherjee and S. Misra, Reconfigure and Reuse: Interoperable Wearables for Healthcare IoT, IEEE INFOCOM 2020, doi 10.1109/INFOCOM41043.2020.9155398; Reconfigure-Reuse-Dataset on GitHub.</string>
+    <string name="nav_research">Research</string>
+    <string name="lab_plot_caption">First %1$d of %2$d values. Each rise and fall is one heartbeat in the recording.</string>
+    <string name="lab_plot_a11y">Graph of the first %2$d values of %1$s</string>
+    <string name="lab_bars_title">ML vs rule on the held-out recording (higher is better)</string>
+    <string name="report_graph_hint">A graph appears once this type has at least 2 readings in the report.</string>
+    <string name="report_symptom_chart">Number of entries that mention each symptom:</string>
+    <string name="export_count">Entries in this export: %1$d</string>
+    <string name="export_filter_note">Only the entries shown in Records are exported. To include everything, tap All types and clear the period and search filters first.</string>
 </resources>

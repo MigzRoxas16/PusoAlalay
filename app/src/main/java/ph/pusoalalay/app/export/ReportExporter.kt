@@ -66,6 +66,8 @@ object ReportExporter {
             y = 54f
         }
         fun line(text: String, bold: Boolean = false) {
+            // A blank spacer never starts a new page, so the report does not end with an empty page.
+            if (text.isEmpty()) { y += 17f; return }
             if (y > 720) newPage()
             paint.typeface = Typeface.create("sans-serif", if (bold) Typeface.BOLD else Typeface.NORMAL)
             page.canvas.drawText(text, 48f, y, paint)
@@ -127,6 +129,26 @@ object ReportExporter {
             paint.textSize = 11f
             y = bottom + 30f
         }
+        fun symptomChart(counts: List<Pair<String, Int>>) {
+            val height = counts.size * 18f + 10f
+            if (y + height > 720f) newPage()
+            val canvas = page.canvas
+            val most = counts.maxOf { it.second }.coerceAtLeast(1)
+            val barLeft = 190f; val barRight = 520f
+            val bar = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.rgb(32, 112, 96) }
+            val track = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.rgb(226, 232, 230) }
+            paint.textSize = 10f
+            paint.typeface = Typeface.create("sans-serif", Typeface.NORMAL)
+            counts.forEach { (label, n) ->
+                canvas.drawText(label, 48f, y + 9f, paint)
+                canvas.drawRect(barLeft, y, barRight, y + 11f, track)
+                canvas.drawRect(barLeft, y, barLeft + (barRight - barLeft) * n / most, y + 11f, bar)
+                canvas.drawText(n.toString(), barRight + 8f, y + 9f, paint)
+                y += 18f
+            }
+            paint.textSize = 11f
+            y += 12f
+        }
         try {
             val now = System.currentTimeMillis()
             val unusual = unusualRecords(records)
@@ -146,6 +168,7 @@ object ReportExporter {
                 val summary = summarize(series)
                 if (summary == null) {
                     paragraph(context.getString(R.string.report_no_data))
+                    paragraph(context.getString(R.string.report_graph_hint))
                     line("")
                     return@forEach
                 }
@@ -160,16 +183,21 @@ object ReportExporter {
                     paragraph(context.getString(R.string.stats_coverage, it.daysWithData, it.totalDays))
                 }
                 paragraph(context.getString(R.string.stats_unusual, series.count { it.id in unusual }))
-                if (series.size >= 2) chart(series) else line("")
+                if (series.size >= 2) chart(series) else {
+                    paragraph(context.getString(R.string.report_graph_hint))
+                    line("")
+                }
             }
             paragraph(context.getString(R.string.symptoms), true)
             val symptomRecords = records.filter { it.kind == RecordKind.SYMPTOM }
             if (symptomRecords.isEmpty()) paragraph(context.getString(R.string.report_no_symptoms))
             else {
                 paragraph(context.getString(R.string.stats_count, symptomRecords.size))
-                Symptom.entries.forEach { symptom ->
-                    val n = symptomRecords.count { symptom in it.symptoms }
-                    if (n > 0) paragraph(context.getString(R.string.report_symptom_summary, context.getString(symptomLabel(symptom)), n))
+                val counts = Symptom.entries.map { context.getString(symptomLabel(it)) to symptomRecords.count { r -> it in r.symptoms } }
+                    .filter { it.second > 0 }
+                if (counts.isNotEmpty()) {
+                    paragraph(context.getString(R.string.report_symptom_chart))
+                    symptomChart(counts)
                 }
             }
             paragraph(context.getString(R.string.stats_explain))
