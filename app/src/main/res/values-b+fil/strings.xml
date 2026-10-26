@@ -117,13 +117,13 @@
     <string name="privacy_title">Ikaw ang may hawak ng iyong impormasyon.</string>
     <string name="privacy_body">Naka-encrypt ang mga sukat at tala gamit ang Android Keystore. Nasa lokal na database ang uri at oras ng tala. Walang internet permission o analytics ang app. Mahalaga pa rin ang seguridad ng device.</string>
     <string name="privacy_backup">Naka-disable ang awtomatikong backup at device transfer. Lagyan ng lock ang phone. Mag-export lamang kung kailangan ng kopya; nababasang file ang mga ulat.</string>
-    <string name="screenshots_note">Naka-block ang screen capture para makatulong protektahan ang iyong mga tala.</string>
+    <string name="screenshots_note">Puwede ang screenshots at screen recording. Anumang nakikita sa screen ay maaaring maisama sa mga kuha na ibinabahagi mo.</string>
     <string name="research">Tungkol sa pag-aaral</string>
     <string name="research_title">Pag-aaral na malinaw ang hangganan.</string>
     <string name="research_body">Inihambing ng ibinigay na course paper noong Oktubre 2026 ang nearest-centroid classifier at fixed rule sa pulse recordings na sadyang binago. Hindi nito napapatunayan ang diagnosis, pagtukoy ng emergency, o accuracy ng wearable.</string>
     <string name="research_metrics">Naka-archive na resulta sa papel: ML F1 0.7914; balanced accuracy 0.4909; specificity 0.1951. Ang rule ay may balanced accuracy na 0.6006. Hindi muling pinatakbo ng Android app ang mga eksperimentong ito.</string>
     <string name="research_limits">Walang classifier na ginagamit sa iyong personal na tala. Wala pang smartwatch import, live sensor, clinical alert, o cloud synchronization sa bersyong ito.</string>
-    <string name="version_label">PusoAlalay · Research prototype v1.2</string>
+    <string name="version_label">PusoAlalay · Research prototype v1.2.2</string>
     <string name="delete_all">Burahin ang lahat ng aking tala</string>
     <string name="delete_all_title">Burahin ang buong talaan?</string>
     <string name="delete_all_body">Permanenteng mabubura ang lahat ng tala sa device at mai-o-off ang paalala. Hindi mabubura ang mga na-export na ulat.</string>

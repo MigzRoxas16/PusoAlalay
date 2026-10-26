@@ -47,8 +47,8 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/aapt2" dump badging "$APK" | head -n 3
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --print-certs "$APK"
           mkdir -p dist
-          cp "$APK" dist/PusoAlalay-v1.2.1.apk
-          sha256sum dist/PusoAlalay-v1.2.1.apk | tee dist/PusoAlalay-v1.2.1.apk.sha256
+          cp "$APK" dist/PusoAlalay-v1.2.2.apk
+          sha256sum dist/PusoAlalay-v1.2.2.apk | tee dist/PusoAlalay-v1.2.2.apk.sha256
 
       - name: Show Room schema (checks the 1 to 2 migration)
         run: cat app/schemas/ph.pusoalalay.app.data.HealthDatabase/2.json || true
@@ -56,21 +56,22 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: PusoAlalay-v1.2.1
+          name: PusoAlalay-v1.2.2
           path: dist/
 
       - name: Publish APK as a GitHub release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.2.1
-          name: PusoAlalay 1.2.1
+          tag_name: v1.2.2
+          name: PusoAlalay 1.2.2
           prerelease: false
           make_latest: true
-          files: dist/PusoAlalay-v1.2.1.apk
+          files: dist/PusoAlalay-v1.2.2.apk
           body: |
             For personal installation and testing on Android 8.0 or later (signed with a development key, not a Play Store release).
-            Download PusoAlalay-v1.2.1.apk on your phone, open it, and allow installing unknown apps.
+            Download PusoAlalay-v1.2.2.apk on your phone, open it, and allow installing unknown apps.
+            Screenshots and screen recording are now allowed.
             Academic prototype: a personal health journal, not a diagnostic or medical device.
 
       # Runs after the APK is uploaded, so a lint failure never hides the APK, but it does mark the run as failed.

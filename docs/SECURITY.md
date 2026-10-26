@@ -32,7 +32,7 @@ The app does not email or share the report automatically. CSV cells are quoted, 
 
 ## Device and UI
 
-FLAG_SECURE is set on the main activity, and notification text contains no measurement or symptom. Notification visibility is private. All manifest receivers are non-exported. Reminder PendingIntents are immutable.
+Screenshots and screen recording are allowed starting in v1.2.2. Visible health records can appear in captures, screen sharing and recent-app previews. Notification text contains no measurement or symptom. Notification visibility is private. All manifest receivers are non-exported. Reminder PendingIntents are immutable.
 
 Since v1.1 the journal requires an on-device account. The session stays signed in until the user signs out, so anyone holding the unlocked phone while signed in can view that journal; there is no biometric lock. Saved form state is managed by Android activity restoration; it is not a separately encrypted persistent-draft store. Device compromise, root access, malicious keyboards, and user-chosen report sharing are not solved by this design.
 

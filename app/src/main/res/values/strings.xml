@@ -117,13 +117,13 @@
     <string name="privacy_title">Your information, in your hands.</string>
     <string name="privacy_body">Health values and notes are encrypted using an Android Keystore key. Record type and time remain in the local database. This app has no internet permission or analytics. Device security still matters.</string>
     <string name="privacy_backup">Automatic backup and device transfer are disabled. Keep your phone locked. Export only when you need a separate copy; exported reports are readable files.</string>
-    <string name="screenshots_note">Screen capture is blocked to help protect your records.</string>
+    <string name="screenshots_note">Screenshots and screen recording are allowed. Anything visible on screen may appear in captures you share.</string>
     <string name="research">About the research</string>
     <string name="research_title">Research with clear limits.</string>
     <string name="research_body">The supplied October 2026 course paper compared a nearest-centroid classifier and a fixed rule on artificially altered pulse recordings. This experiment does not validate diagnosis, emergency detection, or wearable measurement accuracy.</string>
     <string name="research_metrics">Archived paper results: ML F1 0.7914; balanced accuracy 0.4909; specificity 0.1951. The rule had balanced accuracy 0.6006. These results were not rerun by this Android app.</string>
     <string name="research_limits">No classifier is used on your personal records. Smartwatch import, live sensors, clinical alerts, and cloud synchronization are not included in this version.</string>
-    <string name="version_label">PusoAlalay · Research prototype v1.2</string>
+    <string name="version_label">PusoAlalay · Research prototype v1.2.2</string>
     <string name="delete_all">Delete all my records</string>
     <string name="delete_all_title">Delete your entire journal?</string>
     <string name="delete_all_body">All records on this device will be permanently deleted and reminders will be turned off. Reports already exported are not deleted.</string>

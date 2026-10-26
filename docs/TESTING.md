@@ -79,7 +79,7 @@ All items below are pending.
 15. Revoke notification permission after scheduling; confirm no crash and the off notice appears on resume.
 16. Run offline, including airplane mode. Add/edit/delete/export to local storage.
 17. Test at 320dp width, landscape, 200% font size, large display scaling, and TalkBack. Verify focus, labels, visible controls, dialog buttons, and scrolling.
-18. Verify screenshots and recent-app thumbnails do not expose the journal.
+18. Verify screenshots and screen recording work on the dashboard, Records, Research and Settings, including dialogs. Repeat after switching languages and restarting the app. Captures and recent-app thumbnails may include visible journal details.
 19. Inspect the database on a disposable debug device: values/notes must be ciphertext, with only declared metadata visible. Test key loss without real records.
 20. Evaluate loading/scrolling/export with a large synthetic journal explicitly marked as test data.
 
